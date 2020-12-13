@@ -1,11 +1,17 @@
 const Pool = require("pg").Pool;
+require("dotenv").config();
 
-const pool = new Pool({
-  user: "postgres",
-  password: "kthl8822",
-  host: "localhost",
-  port: 5432,
-  database: "perntodo"
-});
+const devConfig = {
+  user: process.env.PG_USER,
+  password: process.env.PG_PASSWORD,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  port: process.env.PG_PORT,
+};
+
+const proConfig = {
+  connectionString: process.env.DATABASE_URL //coming from heroku addons
+}
+const pool = new Pool(devConfig);
 
 module.exports = pool;

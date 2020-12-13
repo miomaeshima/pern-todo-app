@@ -7,13 +7,18 @@ const InputTodo = () => {
     e.preventDefault();
     try {
       const body = { description };
-      const response = await fetch("http://localhost:5000/todos", {
+      // proxy is only used in development so it will be ignored in production 
+      // so if there is no http://localhost:5000 then by default it is going to use heroku domain
+      // remember this heroku app is just our server serving the build static content and also holding the restful application
+      // https://pern-todo-app-demo.herokuapp.com/todos
+
+      const response = await fetch("/todos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
 
-      window.location = "/";
+     // window.location = "/";
     } catch (err) {
       console.error(err.message);
     }

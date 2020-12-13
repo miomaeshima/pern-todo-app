@@ -2,11 +2,28 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const pool = require("./db");
+const path = require("path");
+const { clearScreenDown } = require("readline");
+const PORT = process.env.PORT || 5000;
+//process.env.PORT
+//process.env.NODE_ENV => production or undefined
 
 //middleware
 app.use(cors());
 app.use(express.json()); //req.body
 
+if (process.env.NODE_ENV === "production") {
+  //service static content
+  //npm run build
+  //Line below serves static content from the directory we specify.
+  // So in here, we need to specify where the static file is.
+  //One way to do this is absolute path.
+  //this means the dirname is where index.js is running (= practice-heroku folder)
+  //We join that with client/buildyar
+  app.use(express.static(path.join(__dirname, "client/build")));
+}
+
+console.log(__dirname);
 //ROUTES//
 
 //create a todo
@@ -42,7 +59,7 @@ app.get("/todos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const todo = await pool.query("SELECT * FROM todo WHERE todo_id = $1", [
-      id
+      id,
     ]);
 
     res.json(todo.rows[0]);
@@ -74,7 +91,7 @@ app.delete("/todos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const deleteTodo = await pool.query("DELETE FROM todo WHERE todo_id = $1", [
-      id
+      id,
     ]);
     res.json("Todo was deleted!");
   } catch (err) {
@@ -82,6 +99,11 @@ app.delete("/todos/:id", async (req, res) => {
   }
 });
 
-app.listen(5000, () => {
-  console.log("server has started on port 5000");
+app.get("*", (req, res) => {
+  console.log(__dirname);
+  res.sendFile(__dirname, "client/build/index.html");
+});
+
+app.listen(PORT, () => {
+  console.log(`server has started on port ${PORT}`);
 });
